@@ -11,6 +11,14 @@
 
     <!-- Date Time Picker -->
     <link rel="stylesheet" href="modules/external/datetimepicker/css/bootstrap-datetimepicker.min.css" media="screen">
+
+    <!-- Calendar View -->
+    <link rel="stylesheet" href="interfaces/fullcalendar/fullcalendar.min.css">
+    <link rel="stylesheet" href="interfaces/fullcalendar/fullcalendar.print.css" media="print">
+    <script src="interfaces/fullcalendar/lib/moment.min.js"></script>
+    <script src="interfaces/fullcalendar/gcal.css"></script>
+    <script src="interfaces/fullcalendar/fullcalendar.min.js"></script>
+
     <style>
       body {
         padding:10px;
@@ -40,15 +48,21 @@
       .div-clickable {
         cursor: pointer;
       }
+      #calendar {
+        max-width: 900px;
+        margin: 0 auto;
+      }
     </style>
   </head>
   <body>
     <div class="container" ng-controller="AppCtrl">
-    <div>
+    </div>
     <!-- todo: add other modules here -->
 
     <!-- preferences manager -->
     <script src="modules/preferencemanager/preferences.js"></script>
+
+    <!-- book manager -->
 
     <!-- controller module -->
     <script src="modules/controller/display.js"></script>

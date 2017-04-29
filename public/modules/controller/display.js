@@ -68,24 +68,14 @@ function outputTable(output, rows) {
   var heights = rowHeights(rows);
   var widths = colWidths(rows);
 
-  doc = "<h4 style=\"font-family: sans-serif\">Schedule <small>(updated 03/25/2017)</small></h4>\n\n"
-      + "<div class=\"div-table\" style=\"font-family:sans serif;"
-      + " font-size:12; border:1px solid black; border-collapse:collapse;\">\n";
-
-  rows.map(function(r, r_i) {
-    row = "  <div class=\"div-row\">\n";
-    r.map(function(c, c_i) {
-      var text_a = c.draw(widths[c_i], heights[r_i]);
-      row += outputCell(outputHTML(text_a), c_i, r_i);
-    });
-    row += "  </div>\n";
-    doc += row;
-  });
-  doc += "</div>\n"
+  doc = "<h4 style=\"font-family: sans-serif\">Book Organization Scheduling System</h4>\n<br/>\n"
+  doc += "<div id='calendar'></div>\n"
        + "<br/>\n"
        + "<input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.addProject()\" value=\"Add Book\">\n"
        + "<input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displaySettings()\" value=\"Settings\">\n";
+  //output.body.innerHTML = "<div id='calendar'></div>\n";
   output.body.innerHTML = doc;
+  console.log(doc);
 
   return doc;
 };

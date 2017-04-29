@@ -84,6 +84,10 @@ Calendar.prototype.getEvent = function(day, time) {
     return null;
 }
 
+Calendar.prototype.getFullCalEvent = function(day, time) {
+  
+}
+
 Calendar.prototype.draw = function() {
   return [[
     "",

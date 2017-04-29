@@ -59,6 +59,10 @@ function Controller(output, handlers) {
         c.display.render("calendar", {cal:c.cal});
         break;
 
+      case "SaveSettings":
+        c.display.render("calendar", {cal:c.cal});
+        break;
+
       case "DisplayTable":
         c.display.render("calendar", {cal:c.cal});
         break;
@@ -134,4 +138,62 @@ $(document).ready(function() {
   this.handlers = {};
   var c = new Controller(document, this.handlers);
   c.execute();
+  $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,basicWeek,basicDay'
+      },
+      defaultDate: '2017-04-29',
+      navLinks: true, // can click day/week names to navigate views
+      editable: true,
+      eventLimit: true, // allow "more" link when too many events
+      events: [
+        {
+          title: 'BIOL1010 Lab Meeting',
+          start: '2017-04-24T15:00:00',
+          end: '2017-04-24T17:00:00'
+        },
+        {
+          title: 'BIOL1010 Class Meeting',
+          start: '2017-04-24T18:00:00',
+          end: '2017-04-24T19:00:00'
+        },
+        {
+          title: 'CS3035 Class Meeting',
+          start: '2017-04-25T08:50:00',
+          end: '2017-04-25T10:50:00'
+        },
+        {
+          title: 'CS3186 Class Meeting',
+          start: '2017-04-25T18:00:00',
+          end: '2017-04-25T19:20:00'
+        },
+        {
+          title: 'BIOL1010 Class Meeting',
+          start: '2017-04-26T18:00:00',
+          end: '2017-04-26T19:00:00'
+        },
+        {
+          title: 'CS3035 Class Meeting',
+          start: '2017-04-27T08:50:00',
+          end: '2017-04-27T10:50:00'
+        },
+        {
+          title: 'CS3186 Class Meeting',
+          start: '2017-04-27T18:00:00',
+          end: '2017-04-27T19:20:00'
+        },
+        {
+          title: 'CS3801 Class Meeting',
+          start: '2017-04-28T16:00:00',
+          end: '2017-04-28T20:00:00'
+        },
+        {
+          title: 'CS3337 Class Meeting',
+          start: '2017-04-29T11:30:00',
+          end: '2017-04-29T15:40:00'
+        }
+      ]
+    });
 });

@@ -1,96 +1,29 @@
-/*
- * CS3035 TextCell codes
- *
- */
-
-function TextCell(text) {
-  this.text = text.split("\n");
-}
-
-TextCell.prototype.minWidth = function() {
-  return this.text.reduce(function(width, line) {
-    return Math.max(width, line.length);
-  }, 0);
-};
-
-TextCell.prototype.minHeight = function() {
-  return this.text.length;
-};
-
-TextCell.prototype.draw = function(width, height) {
-  var result = [];
-  for (var i=0; i<height; i++) {
-    var line = this.text[i] || "";
-    result.push(line + repeat(" ", width - line.length));
-  }
-  return result;
-};
-
-// repeat doesn't seem to be a built-in function, so I'm adding an alternative here
-function repeat(text, n) {
-  if (n<=0) return "";
-  return text.repeat(n);
-}
-
-function rowHeights(rows) {
-  return rows.map(function(row) {
-    return row.reduce(function(max, cell) {
-      return Math.max(max, cell.minHeight());
-    }, 0);
-  });
-}
-
-function colWidths(rows) {
-  return rows[0].map(function(_, i) {
-    return rows.reduce(function(max, row) {
-      return Math.max(max, row[i].minWidth());
-    }, 0);
-  });
-}
-
-function outputHTML(text_a) {
-  if (text_a.length == 0) return "";
-  var r = "<p>";
-  for (var i in text_a) {
-    r += text_a[i] + "<br/>";
-  }
-  return r + "</p>";
-}
-
-function outputCell(text, x, y, flag) {
-  var r = "    <div onclick=\"handlers.clickEvent(" + x + "," + y + ")\""
-        + " class=\"div-cell " + (flag ? "div-clickable" : "") + "\">" + text + "</div>\n";
-  return r;
-}
-
-function outputTable(output, rows) {
-  var doc, row;
-  var heights = rowHeights(rows);
-  var widths = colWidths(rows);
-
-  doc = "<h4 style=\"font-family: sans-serif\">Book Organization Scheduling System</h4>\n<br/>\n"
-  doc += "<div id='calendar'></div>\n"
-       + "<br/>\n"
-       + "<input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.addProject()\" value=\"Add Book\">\n"
-       + "<input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displaySettings()\" value=\"Settings\">\n";
+function displayTable(output, config) {
+  var doc;
+  doc = "<div style='max-width: 900px; margin: 0px auto'>"
+      + "  <div id='calendar'></div>\n"
+      + "  <br/>\n"
+      + "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.addProject()\" value=\"Add Book\">\n"
+      + "  <input type=\"button\" class=\"btn btn-danger\" onclick=\"\" value=\"Display Progress\">\n"
+      + "  <input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displaySettings()\" value=\"Settings\">\n";
+      + "</div>\n"
   //output.body.innerHTML = "<div id='calendar'></div>\n";
   output.body.innerHTML = doc;
-  console.log(doc);
+  
+  $('#calendar').fullCalendar({
+    header: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'month,basicWeek,basicDay'
+    },
+    defaultDate: '2017-04-29',
+    navLinks: true, // can click day/week names to navigate views
+    editable: true,
+    eventLimit: true, // allow "more" link when too many events
+    events: config.cal.events
+  });
 
   return doc;
-};
-
-function arrayToCells(array) {
-  return array.map(function(row) {
-    return row.map(function(cell) {
-      return new TextCell(cell);
-    });
-  });
-}
-
-function displayTable(output, config) {
-  console.log("Displaying Calendar");
-  outputTable(output, arrayToCells(config.cal.draw()));
 }
 
 function displayEvent(output, config) {

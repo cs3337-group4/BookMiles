@@ -53,10 +53,22 @@
   <body>
     <div class="container" ng-controller="AppCtrl">
     </div>
+    <!-- google calendar prerequisite -->
+    <!--
+    <script async defer src="https://apis.google.com/js/api.js"
+     onload="this.onload=function(){};handleClientLoad()"
+     onreadystatechange="if (this.readyState === 'complete') this.onload()">
+   </script>
+   -->
+   <script src="https://apis.google.com/js/api.js"></script>
+
     <!-- todo: add other modules here -->
 
     <!-- preferences manager -->
     <script src="modules/preferencemanager/preferences.js"></script>
+
+    <!-- schedule manager -->
+    <script src="modules/schedulemanager/gcalendar.js"></script>
 
     <!-- book manager -->
 

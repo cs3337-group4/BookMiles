@@ -20,7 +20,13 @@ function displayTable(output, config) {
     navLinks: true, // can click day/week names to navigate views
     editable: true,
     eventLimit: true, // allow "more" link when too many events
-    events: config.cal.events
+    events: config.cal.events,
+    eventClick: function(event, jsEvent, view) {
+      console.log("Clicked on: " + event.title + " [" + event.id + "]");
+      console.log(this);
+      console.log(window.parent);
+      window.handlers.clickEvent(jsEvent.pageX, jsEvent.pageY);
+    }
   });
 
   return doc;

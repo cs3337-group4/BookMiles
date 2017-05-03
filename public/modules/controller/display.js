@@ -4,7 +4,7 @@ function displayTable(output, config) {
       + "  <div id='calendar'></div>\n"
       + "  <br/>\n"
       + "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.addProject()\" value=\"Add Book\">\n"
-      + "  <input type=\"button\" class=\"btn btn-danger\" onclick=\"\" value=\"Display Progress\">\n"
+      + "  <input type=\"button\" class=\"btn btn-danger\" onclick=\"handlers.displayHistory()\" value=\"Display Progress\">\n"
       + "  <input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displaySettings()\" value=\"Settings\">\n";
       + "</div>\n"
   //output.body.innerHTML = "<div id='calendar'></div>\n";
@@ -22,10 +22,7 @@ function displayTable(output, config) {
     eventLimit: true, // allow "more" link when too many events
     events: config.cal.events,
     eventClick: function(event, jsEvent, view) {
-      console.log("Clicked on: " + event.title + " [" + event.id + "]");
-      console.log(this);
-      console.log(window.parent);
-      window.handlers.clickEvent(jsEvent.pageX, jsEvent.pageY);
+      config.handlers.clickEvent(event.id);
     }
   });
 
@@ -33,26 +30,45 @@ function displayTable(output, config) {
 }
 
 function displayEvent(output, config) {
-  var x = config.x;
-  var y = config.y;
-  var cell = config.e;
-  var t = config.cal.getTime(y-1);
-  var d = config.cal.getDay(x);
+  var e = config.event;
 
-  doc = "<h4 style=\"font-family:sans-serif\">" + d + " @ " + t + "</h4>\n\n"
+  function to12H(date) {
+    var h = date.getHours();
+    var m = date.getMinutes();
+
+    return ((h > 12 ? h - 12 : h) + ":" + (m < 10 ? "0" + m : m) + (h > 12 ? "PM" : "AM"));
+  }
+
+  doc = "<h4 style=\"font-weight:bold\">" + e.start.substring(0, 10) + "</h4>\n\n"
       + "<form>\n"
+      /*
       + "  <div class=\"form-group\">\n"
-      + "    <label for=\"user\">Event Name</label>\n"
-      + "    <input type=\"text\" class=\"form-control\" id=\"event\" value=\"" + cell + "\">\n"
+      + "    <label for=\"title\">Event Name</label>\n"
+      + "    <input type=\"text\" class=\"form-control\" id=\"title\" value=\"" + e.title + "\">\n"
       + "  </div>\n"
+      + "  <div class=\"form-group\">\n"
+      + "    <label for=\"text\">Event Description</label>\n"
+      + "    <input type=\"text\" class=\"form-control\" id=\"text\" value=\"" + e.text + "\">\n"
+      + "  </div>\n"
+      */
+      + "  <label style=\"font-weight:bold\">Title:</label><span> " + e.title + "</span>\n"
+      + "  <br/>"
+      + "  <label style=\"font-weight:bold\">Description:</label><span> " + e.text + "</span>\n"
+      + "  <br/>"
+      + "  <label style=\"font-weight:bold\">Start time:</label><span> " + to12H(new Date(e.start)) + "</span>\n"
+      + "  <br/>"
+      + "  <label style=\"font-weight:bold\">End time:</label><span> " + to12H(new Date(e.end)) + "</span>\n"
+      + "  <br/>"
+      /*
       + "  <div class=\"form-check\">\n"
       + "    <label class=\"form-check-label\">"
       + "      <input type=\"checkbox\" class=\"form-check-input\" name=\"options\" id=\"opt1\" value=\"opt1\">"
       + "      Set as Busy\n"
       + "    </label>\n"
       + "  </div>\n";
+      */
 
-  if (cell.includes("Read")) {
+  if (e.title.includes("Read")) {
     doc += "  <div class=\"form-group\">\n"
         +  "    <label for=\"sel1\">Make a reading progress report:</label>\n"
         +  "    <select class=\"form-control\" id=\"sel1\">\n"
@@ -65,8 +81,8 @@ function displayEvent(output, config) {
         +  "  </div>\n";
   }
 
-  doc += "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.saveEvent(" + x + ", " + y + ")\" value=\"Save\">\n"
-      +  "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Cancel\">\n"
+  doc += (!e.readonly ? "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.saveEvent(" + e.id + ")\" value=\"Save\">\n" : "")
+      +  "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
       +  "</form>\n"
   output.body.innerHTML = doc;
 
@@ -168,28 +184,34 @@ function DisplayHTML(output, handlers, callback) {
   this._handlers = handlers;
 
   // setting up necessary handlers for the views here
-  handlers.clickEvent = function(x, y) {
-    callback("ClickEvent", {x:x, y:y});
+  handlers.clickEvent = function(id) {
+    callback("Display", "clickEvent", {id:id});
   }
 
-  handlers.saveEvent = function(x, y) {
-    callback("SaveEvent", {x:x, y:y});
+  handlers.saveEvent = function(id) {
+    callback("Display", "saveEvent", {id:id});
   }
 
   handlers.confirmProject = function() {
-    callback("BookAddEvent", null);
+    callback("Display", "bookAddEvent", null);
   }
 
   handlers.displayTable = function() {
-    callback("DisplayTable", null);
+    callback("Display", "displayTable", null);
   }
 
   handlers.addProject = function() {
-    callback("AddProject", null);
+    callback("Display", "addProject", null);
+  }
+
+  handlers.displayHistory = function() {
+    console.log("Displaying History");
+    // todo: implement this callback
+    //callback("Display", "displayProgress", null);
   }
 
   handlers.displaySettings = function() {
-    callback("DisplaySettings", null);
+    callback("Display", "displaySettings", null);
   }
 }
 

@@ -21,7 +21,8 @@ function Calendar() {
       text: "Intro to Biology Laboratory",
       backgroundColor: "#f06060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T15:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T17:00:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T17:00:00",
+      readonly: true
     });
     this.id++;
     this.events.push({
@@ -30,7 +31,8 @@ function Calendar() {
       text: "Intro to Biology Lecture",
       backgroundColor: "#f06060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -44,7 +46,8 @@ function Calendar() {
       text: "Programming Paradigms Lecture",
       backgroundColor: "#60f060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T08:50:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00",
+      readonly: true
     });
     this.id++;
     this.events.push({
@@ -53,7 +56,8 @@ function Calendar() {
       text: "Intro to Automata Lecture",
       backgroundColor: "#f0d060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -67,7 +71,8 @@ function Calendar() {
       text: "Intro to Biology Lecture",
       backgroundColor: "#f06060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -81,7 +86,8 @@ function Calendar() {
       text: "Programming Paradigms Lecture",
       backgroundColor: "#60f060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T08:50:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00",
+      readonly: true
     });
     this.id++;
     this.events.push({
@@ -90,7 +96,8 @@ function Calendar() {
       text: "Intro to Automata Lecture",
       backgroundColor: "#f0d060",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -104,7 +111,8 @@ function Calendar() {
       text: "Ethical Issues in Computing Lecture",
       backgroundColor: "#60c0f0",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T16:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T20:00:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T20:00:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -118,7 +126,8 @@ function Calendar() {
       text: "Software Engineering Lecture",
       backgroundColor: "#f080f0",
       start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T11:30:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T15:40:00"
+      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T15:40:00",
+      readonly: true
     });
     this.id++;
     day++;
@@ -145,10 +154,10 @@ Calendar.prototype.addEvent = function(title, text, start, end) {
   this.id++;
 }
 
-Calendar.prototype.getEvent = function(date) {
+Calendar.prototype.getEvent = function(id) {
   for (var e in this.events) {
-    if (e.date == date)
-      return e;
+    if (this.events[e].id == id)
+      return this.events[e];
   }
   return null;
 }

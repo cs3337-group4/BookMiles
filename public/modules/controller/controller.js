@@ -5,6 +5,7 @@ function Controller(output, handlers) {
   this.prefs = new Preferences();
   // create a local instance of a Calendar storage (see class calendar.js for more details)
   this.cal = new Calendar();
+  this.handlers = handlers;
 
   var c = this;
 
@@ -17,48 +18,44 @@ function Controller(output, handlers) {
       y = config.y;
     }
     // handling event callbacks from the display
-    if (origin == "display") {
+    if (origin == "Display") {
       switch(event) {
-        case "ClickEvent":
-          var t = c.cal.getTime(y-1);
-          var d = c.cal.getDay(x);
-          var e = c.cal.getEvent(d, t);
-          console.log("clicked on (" + x + "," + y + "): " + e);
+        case "clickEvent":
+          var e = c.cal.getEvent(config.id);
+          console.log(e);
           if (e != null)
-            c.display.render("event_edit", {cal:c.cal, e:e, x:x, y:y});
+            c.display.render("event_edit", {event:e});
           break;
 
-        case "SaveEvent":
-          var t = c.cal.getTime(y-1);
-          var d = c.cal.getDay(x);
-          var e = output.getElementById("event").value;
-          c.cal.addEvent(e, d, t);
-          c.display.render("calendar", {cal:c.cal});
+        case "saveEvent":
+          var e = c.cal.getEvent(config.id);
+          c.cal.editEvent(e.id, config.params);
+          c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
 
-        case "BookAddEvent":
+        case "bookAddEvent":
           var book = output.getElementById("book").value;
           var freq = output.getElementById("freq").value;
           if (!freq || freq == "more than 3 times") freq = 7;
           console.log("Confirm adding " + book + " at " + freq);
           for (var i=0; i<freq; i++)
             addBookEvent(c.cal, "Read \"" + book + "\"");
-          c.display.render("calendar", {cal:c.cal});
+          c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
 
-        case "SaveSettings":
-          c.display.render("calendar", {cal:c.cal});
+        case "saveSettings":
+          c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
 
-        case "DisplayTable":
-          c.display.render("calendar", {cal:c.cal});
+        case "displayTable":
+          c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
 
-        case "AddProject":
+        case "addProject":
           c.display.render("book_add", null);
           break;
 
-        case "DisplaySettings":
+        case "displaySettings":
           c.display.render("settings", c.prefs.appconfig);
           break;
       }
@@ -66,9 +63,7 @@ function Controller(output, handlers) {
     else if (origin == "SchedMan") {
       switch(event) {
         case "fetchEvents":
-          for (var e in config.events) {
-            console.log(config.events[e]);
-          }
+          console.log("Fetched events from Google Calendar");
           break;
         case "addEvent":
           console.log("Successfully added event into Google Calendar");
@@ -86,7 +81,7 @@ function Controller(output, handlers) {
 
 Controller.prototype.execute = function() {
   console.log("Launching BOSS Calendar Controller");
-  this.display.render("calendar", {cal:this.cal});
+  this.display.render("calendar", {cal:this.cal, handlers: this.handlers});
 }
 
 $(document).ready(function() {

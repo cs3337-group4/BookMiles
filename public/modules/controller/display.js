@@ -180,12 +180,12 @@ function addProject(output) {
 }
 
 function displayHistory(output, config) {
-  var doc = "<div style=\"width:75%;\">\n"
+  var doc = "<div style='max-width: 900px; margin: 0px auto'>"
           + "  <canvas id=\"canvas\"></canvas>\n"
+          + "  <br>\n"
+          + "  <br>\n"
+          + "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
           + "</div>\n"
-          + "<br>\n"
-          + "<br>\n"
-          + "<input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
   output.body.innerHTML = doc;
   console.log(doc);
 
@@ -193,16 +193,32 @@ function displayHistory(output, config) {
     return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
   }
 
+  function randomBook() {
+    var books = [
+      "Harry Potter",
+      "The Lord of the Ring",
+      "Fifty Shades of Grey",
+      "The Unspoken Rule",
+      "How To Make Friends",
+      "The Quiet American"
+    ];
+
+    console.log(Math.random() * books.length);
+    return books[Math.round(Math.random() * (books.length-1))];
+  }
+
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var config = {
     type: 'line',
     data: {
-      labels: ["January", "February", "March", "April", "May", "June", "July"],
+      labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September"],
       datasets: [{
-        label: "My 1st Book",
+        label: randomBook(),
         backgroundColor: 'rgb(255, 99, 132)',
         borderColor: 'rgb(255, 99, 132)',
         data: [
+          randomScalingFactor(),
+          randomScalingFactor(),
           randomScalingFactor(),
           randomScalingFactor(),
           randomScalingFactor(),
@@ -213,11 +229,13 @@ function displayHistory(output, config) {
         ],
         fill: false,
       }, {
-        label: "My 2nd Book",
+        label: randomBook(),
         fill: false,
         backgroundColor: 'rgb(54, 162, 235)',
         borderColor: 'rgb(54, 162, 235)',
         data: [
+          randomScalingFactor(),
+          randomScalingFactor(),
           randomScalingFactor(),
           randomScalingFactor(),
           randomScalingFactor(),
@@ -254,7 +272,7 @@ function displayHistory(output, config) {
           display: true,
           scaleLabel: {
             display: true,
-            labelString: 'Value'
+            labelString: 'Pages Read'
           }
         }]
       }

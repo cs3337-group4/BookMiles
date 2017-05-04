@@ -52,7 +52,11 @@ function Controller(output, handlers) {
           break;
 
         case "addProject":
-          c.display.render("book_add", null);
+          c.display.render("book_add", {});
+          break;
+
+        case "displayProgress":
+          c.display.render("history", {});
           break;
 
         case "displaySettings":

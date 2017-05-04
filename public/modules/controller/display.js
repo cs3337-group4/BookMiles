@@ -106,7 +106,7 @@ function displaySettings(output, config) {
 
   doc += "  </fieldset>\n"
       +  "  <input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displayTable()\" value=\"Save\">\n"
-      +  "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Cancel\">\n"
+      +  "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
       +  "</form>\n";
 
   output.body.innerHTML = doc;
@@ -174,9 +174,155 @@ function addProject(output) {
       + "    </div>\n"
       + "  </fieldset>\n"
       + "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.confirmProject()\" value=\"Add Book\">\n"
-      + "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Cancel\">\n"
+      + "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
       + "</form>\n"
   output.body.innerHTML = doc;
+}
+
+function displayHistory(output, config) {
+  var doc = "<div style=\"width:75%;\">\n"
+          + "  <canvas id=\"canvas\"></canvas>\n"
+          + "</div>\n"
+          + "<br>\n"
+          + "<br>\n"
+          + "<input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
+  output.body.innerHTML = doc;
+  console.log(doc);
+
+  function randomScalingFactor() {
+    return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
+  }
+
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var config = {
+    type: 'line',
+    data: {
+      labels: ["January", "February", "March", "April", "May", "June", "July"],
+      datasets: [{
+        label: "My 1st Book",
+        backgroundColor: 'rgb(255, 99, 132)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: [
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ],
+        fill: false,
+      }, {
+        label: "My 2nd Book",
+        fill: false,
+        backgroundColor: 'rgb(54, 162, 235)',
+        borderColor: 'rgb(54, 162, 235)',
+        data: [
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor(),
+          randomScalingFactor()
+        ],
+      }]
+    },
+    options: {
+      responsive: true,
+      title:{
+        display:true,
+        text:'Your Reading Projects'
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false,
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: true
+      },
+      scales: {
+        xAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Month'
+          }
+        }],
+        yAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Value'
+          }
+        }]
+      }
+    }
+  };
+
+  var ctx = document.getElementById("canvas").getContext("2d");
+  window.myLine = new Chart(ctx, config);
+
+  /*
+  document.getElementById('randomizeData').addEventListener('click', function() {
+    config.data.datasets.forEach(function(dataset) {
+      dataset.data = dataset.data.map(function() {
+        return randomScalingFactor();
+      });
+    });
+
+    window.myLine.update();
+  });
+
+  var colorNames = Object.keys(window.chartColors);
+  document.getElementById('addDataset').addEventListener('click', function() {
+    var colorName = colorNames[config.data.datasets.length % colorNames.length];
+    var newColor = window.chartColors[colorName];
+    var newDataset = {
+      label: 'Dataset ' + config.data.datasets.length,
+      backgroundColor: newColor,
+      borderColor: newColor,
+      data: [],
+      fill: false
+    };
+
+    for (var index = 0; index < config.data.labels.length; ++index) {
+      newDataset.data.push(randomScalingFactor());
+    }
+
+    config.data.datasets.push(newDataset);
+    window.myLine.update();
+  });
+
+  document.getElementById('addData').addEventListener('click', function() {
+    if (config.data.datasets.length > 0) {
+      var month = MONTHS[config.data.labels.length % MONTHS.length];
+      config.data.labels.push(month);
+
+      config.data.datasets.forEach(function(dataset) {
+        dataset.data.push(randomScalingFactor());
+      });
+
+      window.myLine.update();
+    }
+  });
+
+  document.getElementById('removeDataset').addEventListener('click', function() {
+    config.data.datasets.splice(0, 1);
+    window.myLine.update();
+  });
+
+  document.getElementById('removeData').addEventListener('click', function() {
+    config.data.labels.splice(-1, 1); // remove the label first
+
+    config.data.datasets.forEach(function(dataset, datasetIndex) {
+      dataset.data.pop();
+    });
+
+    window.myLine.update();
+  });
+  */
 }
 
 function DisplayHTML(output, handlers, callback) {
@@ -207,7 +353,7 @@ function DisplayHTML(output, handlers, callback) {
   handlers.displayHistory = function() {
     console.log("Displaying History");
     // todo: implement this callback
-    //callback("Display", "displayProgress", null);
+    callback("Display", "displayProgress", null);
   }
 
   handlers.displaySettings = function() {
@@ -226,6 +372,9 @@ DisplayHTML.prototype.render = function(page, config) {
       break;
     case "event_edit":
       displayEvent(this._output, config);
+      break;
+    case "history":
+      displayHistory(this._output, config);
       break;
     case "settings":
       displaySettings(this._output, config);

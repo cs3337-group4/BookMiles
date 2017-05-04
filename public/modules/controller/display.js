@@ -181,13 +181,15 @@ function addProject(output) {
 
 function displayHistory(output, config) {
   var doc = "<div style='max-width: 900px; margin: 0px auto'>"
-          + "  <canvas id=\"canvas\"></canvas>\n"
+          + "  <div id=\"canvas-container\"></div>\n"
           + "  <br>\n"
           + "  <br>\n"
+          + "  <button class=\"btn btn-danger\" id=\"dayView\">Daily View</button>\n"
+          + "  <button class=\"btn btn-warning\" id=\"weekView\">Weekly View</button>\n"
+          + "  <button class=\"btn btn-primary\" id=\"monthView\">Monthly View</button>\n"
           + "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
           + "</div>\n"
   output.body.innerHTML = doc;
-  console.log(doc);
 
   function randomScalingFactor() {
     return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
@@ -203,11 +205,9 @@ function displayHistory(output, config) {
       "The Quiet American"
     ];
 
-    console.log(Math.random() * books.length);
     return books[Math.round(Math.random() * (books.length-1))];
   }
 
-  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var config = {
     type: 'line',
     data: {
@@ -279,8 +279,251 @@ function displayHistory(output, config) {
     }
   };
 
+  var canvas = document.createElement("canvas");
+  canvas.id = "canvas";
+  document.getElementById("canvas-container").appendChild(canvas);
   var ctx = document.getElementById("canvas").getContext("2d");
   window.myLine = new Chart(ctx, config);
+
+  document.getElementById('dayView').addEventListener('click', function() {
+    config = {
+      type: 'line',
+      data: {
+        labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        datasets: [{
+          label: randomBook(),
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+          fill: false,
+        }, {
+          label: randomBook(),
+          fill: false,
+          backgroundColor: 'rgb(54, 162, 235)',
+          borderColor: 'rgb(54, 162, 235)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+        }]
+      },
+      options: {
+        responsive: true,
+        title:{
+          display:true,
+          text:'Your Reading Projects'
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Day'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Pages Read'
+            }
+          }]
+        }
+      }
+    };
+
+    document.getElementById("canvas-container").removeChild(canvas);
+    canvas = document.createElement("canvas");
+    canvas.id = "canvas";
+    document.getElementById("canvas-container").appendChild(canvas);
+    ctx = document.getElementById("canvas").getContext("2d");
+    window.myLine = new Chart(ctx, config);
+  });
+
+  document.getElementById('weekView').addEventListener('click', function() {
+    config = {
+      type: 'line',
+      data: {
+        labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7"],
+        datasets: [{
+          label: randomBook(),
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+          fill: false,
+        }, {
+          label: randomBook(),
+          fill: false,
+          backgroundColor: 'rgb(54, 162, 235)',
+          borderColor: 'rgb(54, 162, 235)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+        }]
+      },
+      options: {
+        responsive: true,
+        title:{
+          display:true,
+          text:'Your Reading Projects'
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Week'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Pages Read'
+            }
+          }]
+        }
+      }
+    };
+
+    document.getElementById("canvas-container").removeChild(canvas);
+    canvas = document.createElement("canvas");
+    canvas.id = "canvas";
+    document.getElementById("canvas-container").appendChild(canvas);
+    ctx = document.getElementById("canvas").getContext("2d");
+    window.myLine = new Chart(ctx, config);
+  });
+
+  document.getElementById('monthView').addEventListener('click', function() {
+    var config = {
+      type: 'line',
+      data: {
+        labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September"],
+        datasets: [{
+          label: randomBook(),
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+          fill: false,
+        }, {
+          label: randomBook(),
+          fill: false,
+          backgroundColor: 'rgb(54, 162, 235)',
+          borderColor: 'rgb(54, 162, 235)',
+          data: [
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor(),
+            randomScalingFactor()
+          ],
+        }]
+      },
+      options: {
+        responsive: true,
+        title:{
+          display:true,
+          text:'Your Reading Projects'
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Month'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Pages Read'
+            }
+          }]
+        }
+      }
+    };
+
+    document.getElementById("canvas-container").removeChild(canvas);
+    canvas = document.createElement("canvas");
+    canvas.id = "canvas";
+    document.getElementById("canvas-container").appendChild(canvas);
+    ctx = document.getElementById("canvas").getContext("2d");
+    window.myLine = new Chart(ctx, config);
+  });
 
   /*
   document.getElementById('randomizeData').addEventListener('click', function() {

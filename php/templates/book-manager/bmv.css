@@ -1,0 +1,32 @@
+body{
+    background: #27485a;
+    color: #e8e8e8;
+}
+
+.topbar{
+    left: 0px;
+    right: 0px;
+    position:fixed;
+    z-index: 999;
+    background-color: #4e748a;
+    border-radius: 0px;
+    border: none;
+    height: 65px;
+}
+
+.topbar h3{
+    margin-left: 2.5%;
+}
+
+.topbar-holder {
+    height: 75px;
+}
+
+.forms{
+    margin: 0px 10px;
+}
+
+.header-title{
+    margin: 0.2% 0px 1.2% 10%;
+    font-weight: bold;
+}

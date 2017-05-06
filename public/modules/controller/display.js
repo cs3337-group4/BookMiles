@@ -7,18 +7,18 @@ function displayTable(output, config) {
       + "  <input type=\"button\" class=\"btn btn-danger\" onclick=\"handlers.displayHistory()\" value=\"Display Progress\">\n"
       + "  <input type=\"button\" class=\"btn btn-info\" onclick=\"handlers.displaySettings()\" value=\"Settings\">\n";
       + "</div>\n"
-  //output.body.innerHTML = "<div id='calendar'></div>\n";
   output.body.innerHTML = doc;
-  
+
   $('#calendar').fullCalendar({
     header: {
       left: 'prev,next today',
       center: 'title',
-      right: 'month,basicWeek,basicDay'
+      right: 'agendaDay,agendaWeek,month'
     },
-    defaultDate: '2017-04-29',
+    defaultView: 'agendaWeek',
+    defaultDate: (new Date()).toISOString(),
     navLinks: true, // can click day/week names to navigate views
-    editable: true,
+    editable: false,
     eventLimit: true, // allow "more" link when too many events
     events: config.cal.events,
     eventClick: function(event, jsEvent, view) {
@@ -91,6 +91,8 @@ function displayEvent(output, config) {
 
 function displaySettings(output, config) {
   doc = "<h4 style=\"font-family:sans-serif\">Settings</h4>\n\n"
+      + "Sleep time: <b>12:00AM</b> <input id=\"ex2\" type=\"text\" class=\"span2\" value=\"\" data-slider-min=\"10\" data-slider-max=\"1000\" data-slider-step=\"5\" data-slider-value=\"[0,24]\"/> <b>12:00AM</b>\n"
+      + "<br>"
       + "<form>\n"
       + "  <fieldset class=\"form-group\">\n";
 
@@ -589,6 +591,15 @@ function displayHistory(output, config) {
 function DisplayHTML(output, handlers, callback) {
   this._output = output;
   this._handlers = handlers;
+
+  var doc;
+  doc = "<div style=\"max-width:800px; margin:auto\">\n"
+      + "  <h2 style=\"text-align:center\">Loading Google Calendar Events</h2>\n"
+      + "  <br/>"
+      + "  <img style=\"margin:auto\" src=\"" + window.location.href + "/templates/main-viewer/assets/calendar-flip.gif\" alt=\"CALENDAR\" width=\"800\" height=\"600\">"
+      + "</div>\n"
+      
+  output.body.innerHTML = doc;
 
   // setting up necessary handlers for the views here
   handlers.clickEvent = function(id) {

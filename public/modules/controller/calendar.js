@@ -3,6 +3,7 @@ function Calendar() {
   this.id = 0;
   this.events = [];
 
+  /*
   var month_end = [];
   month_end[0] = -1;
   month_end[1] = 31;
@@ -141,6 +142,7 @@ function Calendar() {
       day = 1;
     }
   }
+  */
 }
 
 Calendar.prototype.addEvent = function(title, text, start, end) {
@@ -152,6 +154,31 @@ Calendar.prototype.addEvent = function(title, text, start, end) {
     end: end
   })
   this.id++;
+}
+
+Calendar.prototype.parseEvent = function(event, color) {
+  //console.log(event);
+  var start = event.start.dateTime;
+  var end = event.end.dateTime;
+
+  // handle really old Google Calendar event format
+  if(!start)
+    start = event.start.date;
+  if(!end)
+    end = event.end.date;
+
+  var pevent = {
+    id: this.id,
+    title: event.summary,
+    text: event.description,
+    backgroundColor: color,
+    start: start,
+    end: end,
+    readonly: true
+  };
+  this.id++;
+
+  this.events.push(pevent);
 }
 
 Calendar.prototype.getEvent = function(id) {

@@ -1,0 +1,6 @@
+RewriteEngine on
+RewriteRule ^includes/.*$ 404.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^book-manager\/?$ book-manager.php
+RewriteRule ^preference-manager\/?$ preference-manager.php
+RewriteRule ^get-user-data\/?$ get-user-data.php

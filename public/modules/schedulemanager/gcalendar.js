@@ -2,6 +2,7 @@
 function GCalSession(callback) {
   this._callback = callback;
   var gcal = this;
+  var timeMin = (new Date()).getFullYear() + "-01-01T00:00:00.000Z";
   console.log("Initializing Google Calendar API");
   gapi.load("client:auth2", function() {
     gapi.client.init({
@@ -14,10 +15,10 @@ function GCalSession(callback) {
       scope: "https://www.googleapis.com/auth/calendar"
     }).then(function() {
       gapi.auth2.getAuthInstance().isSignedIn.listen(function() {
-        gcal.fetchEvents((new Date()).toISOString(), callback);
+        gcal.fetchEvents(timeMin, callback);
       });
       if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        gcal.fetchEvents((new Date()).toISOString(), callback);
+        gcal.fetchEvents(timeMin, callback);
       }
       else {
         console.log("Attempting to sign in to Google Calendar API");
@@ -53,19 +54,54 @@ GCalSession.prototype.createEvent = function(id, title, text, color, startDate, 
 
 // fetches events from Google Calendar, replaces listUpcomingEvents
 GCalSession.prototype.fetchEvents = function(timeMin, callback) {
-  
+  var gcal = this;
+
+  gapi.client.calendar.calendarList.list().then(function(response) {
+    console.log("Received calendarList response");
+    var cals = response.result.items;
+    var ocals = [];
+
+    for(var i in cals) {
+      var cal = cals[i];
+      ocals.push({
+        id: cal.id,
+        name: cal.summary,
+        color: cal.backgroundColor
+      });
+    }
+
+    var total = ocals.length;
+    var currentIndex = 0;
+
+    gcal.fetchCalendarsR(gcal, ocals, currentIndex, total, timeMin);
+  });
+}
+
+// recursively fetch all calendars that are owned by the current GCal user
+GCalSession.prototype.fetchCalendarsR = function(gcal, ocals, currentIndex, total, timeMin) {
+  var cal = ocals[currentIndex];
+
   gapi.client.calendar.events.list({
-    calendarId: "primary",
+    calendarId: cal.id,
     timeMin: timeMin,
     showDeleted: false,
     singleEvents: true,
-    maxResults: 10,
     orderBy: "startTime"
   }).then(function(response) {
-    // sending the events back to controller.js
-    callback("SchedMan", "fetchEvents", {events: response.result.items});
-  });
+    gcal._callback("SchedMan", "fetchEvents", {
+      currentIndex: currentIndex,
+      total: total,
+      id: cal.id,
+      name: cal.name,
+      color: cal.color,
+      events: response.result.items
+    });
 
+    currentIndex++;
+
+    if (currentIndex < total)
+      gcal.fetchCalendarsR(gcal, ocals, currentIndex, total);
+  });
 }
 
 // add an event to Google Calendar, untested, but should work

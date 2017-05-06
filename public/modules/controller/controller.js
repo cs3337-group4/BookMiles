@@ -1,5 +1,6 @@
 // class Controller representing the Controller module
 function Controller(output, handlers) {
+  console.log("Launching BOSS Calendar Controller");
   this.module = {};
   // create a local instance of a Preferences database
   this.prefs = new Preferences();
@@ -67,7 +68,18 @@ function Controller(output, handlers) {
     else if (origin == "SchedMan") {
       switch(event) {
         case "fetchEvents":
-          console.log("Fetched events from Google Calendar");
+          console.log("Fetched events from calendar " + config.name);
+          console.log("Number " + (config.currentIndex+1) + " of " + config.total);
+          console.log("Id: " + config.id);
+          console.log("Color: " + config.color);
+
+          for(var i in config.events)
+            c.cal.parseEvent(config.events[i], config.color);
+
+          if (config.currentIndex + 1 == config.total) {
+            console.log("Retrieved all calendars, displaying...")
+            c.display.render("calendar", {cal:c.cal, handlers: c.handlers});
+          }
           break;
         case "addEvent":
           console.log("Successfully added event into Google Calendar");
@@ -84,14 +96,14 @@ function Controller(output, handlers) {
 }
 
 Controller.prototype.execute = function() {
-  console.log("Launching BOSS Calendar Controller");
+  
   this.display.render("calendar", {cal:this.cal, handlers: this.handlers});
 }
 
 $(document).ready(function() {
   this.handlers = {};
   var c = new Controller(document, this.handlers);
-  c.execute();
+  //c.execute();
 });
 
 // todo: separate this into Book Manager, Machine Learning, and Schedule Manager modules

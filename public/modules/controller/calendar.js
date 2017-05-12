@@ -2,147 +2,6 @@
 function Calendar() {
   this.id = 0;
   this.events = [];
-
-  /*
-  var month_end = [];
-  month_end[0] = -1;
-  month_end[1] = 31;
-  month_end[2] = 28;
-  month_end[3] = 31;
-  month_end[4] = 30;
-  month_end[5] = 31;
-
-  var month = 1; // starts in february
-  var day = 23;  // starts on Feb 23rd 
-
-  for (var i=0; i<17; i++) {
-    this.events.push({
-      id: this.id,
-      title: "BIOL1010 Lab Meeting",
-      text: "Intro to Biology Laboratory",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T15:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T17:00:00",
-      readonly: true
-    });
-    this.id++;
-    this.events.push({
-      id: this.id,
-      title: "BIOL1010 Class Meeting",
-      text: "Intro to Biology Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    this.events.push({
-      id: this.id,
-      title: "CS3035 Class Meeting",
-      text: "Programming Paradigms Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T08:50:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00",
-      readonly: true
-    });
-    this.id++;
-    this.events.push({
-      id: this.id,
-      title: "CS3186 Class Meeting",
-      text: "Intro to Automata Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    this.events.push({
-      id: this.id,
-      title: "BIOL1010 Class Meeting",
-      text: "Intro to Biology Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:00:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    this.events.push({
-      id: this.id,
-      title: "CS3035 Class Meeting",
-      text: "Programming Paradigms Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T08:50:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T10:50:00",
-      readonly: true
-    });
-    this.id++;
-    this.events.push({
-      id: this.id,
-      title: "CS3186 Class Meeting",
-      text: "Intro to Automata Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T18:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T19:15:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    this.events.push({
-      id: this.id,
-      title: "CS3801 Class Meeting",
-      text: "Ethical Issues in Computing Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T16:00:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T20:00:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    this.events.push({
-      id: this.id,
-      title: "CS3337 Class Meeting",
-      text: "Software Engineering Lecture",
-      backgroundColor: "#60c0f0",
-      start: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T11:30:00",
-      end: "2017-0" + month + "-" + (day < 10 ? "0" + day : day) + "T15:40:00",
-      readonly: true
-    });
-    this.id++;
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-    day++;
-    if (day > month_end[month]) {
-      month++;
-      day = 1;
-    }
-  }
-  */
 }
 
 Calendar.prototype.addEvent = function(title, text, start, end) {
@@ -150,6 +9,7 @@ Calendar.prototype.addEvent = function(title, text, start, end) {
     id: this.id,
     title: title,
     text: text,
+    backgroundColor: "#f06020",
     start: start,
     end: end
   })
@@ -191,7 +51,93 @@ Calendar.prototype.getEvent = function(id) {
 
 Calendar.prototype.deleteEvent = function(id) {
   for (var e in this.events) {
-    if (e.id == id)
-      this.pop(e);
+    var event = this.events[e];
+    if (event.id == id)
+      this.pop(event);
   }
+}
+
+Calendar.prototype.manageEvents = function(rdays, book) {
+  //console.log(rdays);
+  for (var i in rdays) {
+    var slots = generateTimeSlots(22, 6);
+    var date = new Date(rdays[i].date);
+    var time = rdays[i].time;
+    console.log(rdays[i].date);
+    console.log(time);
+
+    var ryear = date.getFullYear();
+    var rmonth = date.getMonth();
+    var rdate = date.getDate();
+
+    for (var e in this.events) {
+      var event = this.events[e];
+      var start = new Date(event.start);
+      var syear = start.getFullYear();
+      var smonth = start.getMonth();
+      var sdate = start.getDate();
+
+      if (ryear==syear && rmonth==smonth && rdate==sdate) {
+        var end = new Date(event.end);
+        var shour = start.getHours();
+        var smin = start.getMinutes();
+        var ehour = end.getHours();
+        var emin = end.getMinutes();
+        shour += smin / 60;
+        ehour += emin / 60;
+
+        for (var j in slots) {
+          var hour = parseInt(slots[j].substring(0,2));
+          var min = parseInt(slots[j].substring(3,5));
+          hour += min / 60;
+          if (hour >= shour && hour <= ehour) {
+            slots[j] = slots[slots.length-1];
+            slots.pop();
+          }
+        }
+      }
+    }
+
+    slots.sort();
+    var rstart;
+    var rend;
+
+    do {
+      var factor = Math.round(time * 2);
+      var index = Math.round(Math.random() * (slots.length - factor -1));
+      rstart = ryear + "-" + ((rmonth+1) < 10 ? "0" + (rmonth+1) : (rmonth+1)) + "-" + (rdate < 10 ? "0" + rdate : rdate) + "T" + slots[index] + ":00.000Z";
+      rend = ryear + "-" + ((rmonth+1) < 10 ? "0" + (rmonth+1) : (rmonth+1)) + "-" + (rdate < 10 ? "0" + rdate : rdate) + "T" + slots[index + factor] + ":00.000Z";
+    }
+    while(!verifyTime(time, rstart, rend));
+
+    this.addEvent("Read " + book.title, "Generated by BOSS Calendar", (new Date(rstart)).toISOString(), (new Date(rend)).toISOString());
+  }
+}
+
+function generateTimeSlots(sleepStart, sleepEnd) {
+  var slots = [];
+
+  var dummy = new Date("2000-01-01T00:00:00");
+  for (var i=0; i<48; i++) {
+    var hour = dummy.getHours();
+    var min = dummy.getMinutes();
+    var slot = (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+    dummy.setMinutes(min + 30);
+    var ahour = hour + min / 60;
+    if (ahour < sleepStart && ahour > sleepEnd)
+      slots.push(slot);
+  }
+
+  return slots;
+}
+
+function verifyTime(time, start, end) {
+  var shour = (new Date(start)).getTime() / (60 * 60 * 1000);
+  var ehour = (new Date(end)).getTime() / (60 * 60 * 1000);
+  var hour = ehour - shour;
+  //console.log(hour);
+  //console.log(Math.abs(Math.round(time - hour)) < 1);
+  if(Math.abs(Math.round(time - hour)) < 1)
+    return true;
+  return false;
 }

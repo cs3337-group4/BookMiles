@@ -23,6 +23,12 @@ function displayTable(output, config) {
     events: config.cal.events,
     eventClick: function(event, jsEvent, view) {
       config.handlers.clickEvent(event.id);
+    },
+    dayClick: function(date, allDay, jsEvent, view) {
+      if (!view || view.name != "agendaDay") {
+        $('#calendar').fullCalendar("gotoDate", date);
+        $('#calendar').fullCalendar("changeView", "agendaDay");
+      }
     }
   });
 
@@ -33,10 +39,12 @@ function displayEvent(output, config) {
   var e = config.event;
 
   function to12H(date) {
-    var h = date.getHours();
-    var m = date.getMinutes();
+    var h = parseInt(date.substring(11,13));
+    var m = date.substring(14,16);
+    var a = h > 12 ? "PM" : "AM";
+    h = h > 12 ? h - 12 : h;
 
-    return ((h > 12 ? h - 12 : h) + ":" + (m < 10 ? "0" + m : m) + (h > 12 ? "PM" : "AM"));
+    return ((h < 10 ? "0" + h : h) + ":" + m + a);
   }
 
   doc = "<h4 style=\"font-weight:bold\">" + e.start.substring(0, 10) + "</h4>\n\n"
@@ -55,9 +63,9 @@ function displayEvent(output, config) {
       + "  <br/>"
       + "  <label style=\"font-weight:bold\">Description:</label><span> " + e.text + "</span>\n"
       + "  <br/>"
-      + "  <label style=\"font-weight:bold\">Start time:</label><span> " + to12H(new Date(e.start)) + "</span>\n"
+      + "  <label style=\"font-weight:bold\">Start time:</label><span> " + to12H(e.start) + "</span>\n"
       + "  <br/>"
-      + "  <label style=\"font-weight:bold\">End time:</label><span> " + to12H(new Date(e.end)) + "</span>\n"
+      + "  <label style=\"font-weight:bold\">End time:</label><span> " + to12H(e.end) + "</span>\n"
       + "  <br/>"
       /*
       + "  <div class=\"form-check\">\n"
@@ -90,10 +98,35 @@ function displayEvent(output, config) {
 }
 
 function displaySettings(output, config) {
-  doc = "<h4 style=\"font-family:sans-serif\">Settings</h4>\n\n"
-      + "Sleep time: <b>12:00AM</b> <input id=\"ex2\" type=\"text\" class=\"span2\" value=\"\" data-slider-min=\"10\" data-slider-max=\"1000\" data-slider-step=\"5\" data-slider-value=\"[0,24]\"/> <b>12:00AM</b>\n"
-      + "<br>"
-      + "<form>\n"
+  doc = "<div style=\"max-width:900px; margin:auto\">\n"
+      + "  <h4 style=\"font-family:sans-serif\">Settings</h4>\n\n"
+      + "  <div class=\"form-horizontal\">"
+      + "    <div class=\"form-group\">\n"
+      + "      <label class=\"control-label\" for=\"sleepStart\">Sleep Start:</label>\n"
+      + "      <div class=\"col-sm-10\">\n"
+      + "        <input class=\"form-control\" type=\"text\" id=\"sleepStart\" placeholder=\"10:00PM\">\n"
+      + "      </div>\n"
+      + "    </div>\n"
+      + "    <div class=\"form-group\">\n"
+      + "      <label class=\"control-label\" for=\"sleepEnd\">Sleep End:</label>\n"
+      + "      <div class=\"col-sm-10\">\n"
+      + "        <input class=\"form-control\" type=\"text\" id=\"sleepEnd\" placeholder=\"6:00AM\">\n"
+      + "      </div>\n"
+      + "    </div>\n"
+      + "    <div class=\"form-group\">\n"
+      + "      <label class=\"control-label\" for=\"pace\">Reading Pace (pages per hour):</label>\n"
+      + "      <div class=\"col-sm-10\">\n"
+      + "        <input class=\"form-control\" type=\"text\" id=\"pace\" placeholder=\"15\">\n"
+      + "      </div>\n"
+      + "    </div>\n"
+      + "    <div class=\"form-group\">\n"
+      + "      <label class=\"control-label\" for=\"allotment\">Allocation (%):</label>\n"
+      + "      <div class=\"col-sm-10\">\n"
+      + "        <input class=\"form-control\" type=\"text\" id=\"allotment\" placeholder=\"10%\">\n"
+      + "      </div>\n"
+      + "    </div>\n"
+      + "  </div>\n"
+      + "  <br>\n"
       + "  <fieldset class=\"form-group\">\n";
 
   for(var i=0; i<config.length; i++) {
@@ -114,71 +147,123 @@ function displaySettings(output, config) {
   output.body.innerHTML = doc;
 }
 
-function addProject(output) {
-  doc = "<h4 style=\"font-family:sans-serif\">Reading Project</h4>\n\n"
-      + "<form>\n"
-      + "  <div class=\"form-group\">\n"
-      + "    <label for=\"user\">Book name (or ISBN)</label>\n"
-      + "    <input type=\"text\" class=\"form-control\" id=\"book\" placeholder=\"Type in your book's name or ISBN\">\n"
+function addProject(output, config) {
+  doc = "<div style=\"max-width:900px; margin:auto\">\n"
+      + "  <h4 style=\"font-family:sans-serif\">Add A Reading Project</h4>\n\n"
+      + "  <div id=\"book-view\">\n"
+      + "    <div class=\"form-group\">\n"
+      + "      <label for=\"user\">Book name (or ISBN without dashes)</label>\n"
+      + "      <input type=\"text\" class=\"form-control\" id=\"book\" placeholder=\"Type in your book's name or ISBN\">\n"
+      + "    </div>\n"
+      + "    <div id=\"book-titles\"></div>\n"
       + "  </div>\n"
-      + "  <div class=\"form-group\"\n"
-      + "    <label for=\"freq\">How many times would you like to read this book per week?</label>\n"
-      + "    <select multiple class=\"form-control\" id=\"freq\">\n"
-      + "      <option>1</option>\n"
-      + "      <option>2</option>\n"
-      + "      <option>3</option>\n"
-      + "      <option>more than 3 times</option>\n"
-      + "    </select>"
-      + "  </div>\n"
-      + "  <fieldset class=\"form-group\">\n"
-      + "    <label>What days of the week would you like to spend on this book? (check all that applies)</label>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt1\" id=\"opt1\" value=\"option1\" checked>"
-      + "        Monday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt2\" id=\"opt2\" value=\"option2\" checked>"
-      + "        Tuesday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt3\" id=\"opt3\" value=\"option3\" checked>"
-      + "        Wednesday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt4\" id=\"opt4\" value=\"option4\" checked>"
-      + "        Thursday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt5\" id=\"opt5\" value=\"option5\" checked>"
-      + "        Friday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt6\" id=\"opt6\" value=\"option6\" checked>"
-      + "        Saturday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "    <div class=\"form-check\">\n"
-      + "      <label class=\"form-check-label\">"
-      + "        <input type=\"radio\" class=\"form-check-input\" name=\"opt7\" id=\"opt7\" value=\"option7\" checked>"
-      + "        Sunday\n"
-      + "      </label>\n"
-      + "    </div>\n"
-      + "  </fieldset>\n"
-      + "  <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.confirmProject()\" value=\"Add Book\">\n"
-      + "  <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
-      + "</form>\n"
+      + "  <div id=\"controls\">\n"
+      //+ "    <input type=\"button\" class=\"btn btn-warning\" onclick=\"handlers.confirmProject()\" value=\"Add Book\">\n"
+      + "    <input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
+      + "  </div>"
+      + "</div>\n"
   output.body.innerHTML = doc;
+
+  var timer = null;
+
+  document.getElementById("book").addEventListener("input", function(event) {
+    var text = event.target.value;
+
+    if (timer != null)
+      window.clearTimeout(timer);
+    timer = setTimeout(function() {
+      var googleAPI = "https://www.googleapis.com/books/v1/volumes?q=" + text;
+
+      $.ajax({
+        dataType: "json",
+        url: googleAPI,
+        dataType: 'json',
+        async: false,
+      }).done(function( data ) {
+        var items = data.items;
+        var space_doc = "<div class=\"list-group\">\n"
+
+        for(var i in items) {
+          var vol = items[i].volumeInfo;
+          //console.log(vol);
+          var img = vol.imageLinks.smallThumbnail;
+          var title = items[i].volumeInfo.title;
+          space_doc += "<div id=\"book_" + i + "\" class=\"list-group-item div-clickable\" style=\"height:130px; -moz-user-select:none; -webkit-user-select:none; user-select:none\">\n"
+                    +  "  <img src=\"" + img + "\" alt=\"cover\" width=\"12%\" style=\"padding:10px; pointer-events:none;\"></img>\n"
+                    +  "  <div style=\"display:inline-block; pointer-events:none\">\n"
+                    +  "    <span style=\"font-weight:bold\">" + title + "</span><br/>\n"
+                    +  "    Author: " + (vol.authors ? vol.authors[0] : "Unknown") + "<br/>\n"
+                    +  "    Published: " + vol.publishedDate + "<br/>\n"
+                    +  "    Page Count: " + vol.pageCount + "\n"
+                    +  "  </div>\n"
+                    +  "</div>\n";
+        }
+        space_doc += "</div><br>\n";
+
+        var space = document.createElement("div");
+        space.id = "space";
+        space.innerHTML = space_doc;
+        var old_space = document.getElementById("space");
+        if(old_space)
+          document.getElementById("book-titles").removeChild(old_space);
+        document.getElementById("book-titles").appendChild(space);
+
+        for(var i in items) {
+          document.getElementById("book_" + i).addEventListener("click", function(event) {
+            console.log("clicked on " + event.target.id);
+            var vol = items[parseInt(event.target.id.substring(5, event.target.id.length))].volumeInfo;
+            var book_doc = "<div style=\"max-width:900px\">"
+                         + "  <div style=\"width:25%; display:inline-block; padding:10px; pointer-events:none;\">"
+                         + "    <img src=\"" + vol.imageLinks.thumbnail + "\" alt=\"cover\" width=\"100%\"></img>\n"
+                         + "  </div>"
+                         + "  <div style=\"display:inline-block; vertical-align:middle; pointer-events:none\">\n"
+                         + "    <span style=\"font-weight:bold\">" + vol.title + "</span><br/>\n"
+                         + "    ISBN: " + vol.industryIdentifiers[0].identifier + "<br/>\n"
+                         + "    Author: " + (vol.authors ? vol.authors[0] : "Unknown") + "<br/>\n"
+                         + "    Publisher: " + vol.publisher + "<br/>\n"
+                         + "    Published: " + vol.publishedDate + "<br/>\n"
+                         + "    Page Count: " + vol.pageCount + "<br/><br/>\n"
+                         + "  </div>\n"
+                         + "</div>\n"
+                         + "<span>" + vol.description + "</span><br/><br/>\n";
+            var controls = "<fieldset class=\"form-group\">\n"
+                         + "  <label>What days of the week would you like to spend on this book? (check all that applies)</label>\n";
+
+            var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+            for(var i=1; i<8; i++) {
+              controls += "  <div class=\"form-check\">\n"
+                       +  "    <label class=\"form-check-label\">"
+                       +  "      <input type=\"checkbox\" class=\"form-check-input\" name=\"opt" + i + "\" id=\"opt" + i + "\" checked>"
+                       +  "      " + days[i-1] + "\n"
+                       +  "    </label>\n"
+                       +  "  </div>\n";
+            }
+
+            controls += "</fieldset>\n"
+                     +  "<input type=\"button\" class=\"btn btn-warning\" id=\"addbtn\" value=\"Add\">\n"
+                     +  "<input type=\"button\" class=\"btn btn-danger\" onclick=\"handlers.addProject()\" value=\"Reset\">\n"
+                     +  "<input type=\"button\" class=\"btn btn-success\" onclick=\"handlers.displayTable()\" value=\"Back\">\n"
+
+            document.getElementById("book-view").innerHTML = book_doc;
+            document.getElementById("controls").innerHTML = controls;
+
+            document.getElementById("addbtn").addEventListener("click", function(event) {
+              console.log("clicked on add btn");
+              console.log(config);
+              var days = [];
+              for(var i=1; i<8; i++) {
+                var opt = document.getElementById("opt" + i);
+                days.push(opt.checked);
+              }
+              vol.days = days;
+              config.callback("BookMan", "addBook", {book: vol});
+            });
+          });
+        }
+      });
+    }, 500);
+  });
 }
 
 function displayHistory(output, config) {
@@ -596,7 +681,7 @@ function DisplayHTML(output, handlers, callback) {
   doc = "<div style=\"max-width:800px; margin:auto\">\n"
       + "  <h2 style=\"text-align:center\">Loading Google Calendar Events</h2>\n"
       + "  <br/>"
-      + "  <img style=\"margin:auto\" src=\"" + window.location.href + "/templates/main-viewer/assets/calendar-flip.gif\" alt=\"CALENDAR\" width=\"800\" height=\"600\">"
+      + "  <img style=\"margin:auto\" src=\"" + window.location.href + "/assets/calendar-flip.gif\" alt=\"CALENDAR\" width=\"800\" height=\"600\">"
       + "</div>\n"
       
   output.body.innerHTML = doc;
@@ -610,10 +695,6 @@ function DisplayHTML(output, handlers, callback) {
     callback("Display", "saveEvent", {id:id});
   }
 
-  handlers.confirmProject = function() {
-    callback("Display", "bookAddEvent", null);
-  }
-
   handlers.displayTable = function() {
     callback("Display", "displayTable", null);
   }
@@ -623,8 +704,6 @@ function DisplayHTML(output, handlers, callback) {
   }
 
   handlers.displayHistory = function() {
-    console.log("Displaying History");
-    // todo: implement this callback
     callback("Display", "displayProgress", null);
   }
 
@@ -640,7 +719,7 @@ DisplayHTML.prototype.render = function(page, config) {
       displayTable(this._output, config);
       break;
     case "book_add":
-      addProject(this._output);
+      addProject(this._output, config);
       break;
     case "event_edit":
       displayEvent(this._output, config);

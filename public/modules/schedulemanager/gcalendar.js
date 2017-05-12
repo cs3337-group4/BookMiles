@@ -1,4 +1,4 @@
-// class GCalSession
+// class GCalSession implements Google Calendar API
 function GCalSession(callback) {
   this._callback = callback;
   var gcal = this;
@@ -63,11 +63,14 @@ GCalSession.prototype.fetchEvents = function(timeMin, callback) {
 
     for(var i in cals) {
       var cal = cals[i];
-      ocals.push({
-        id: cal.id,
-        name: cal.summary,
-        color: cal.backgroundColor
-      });
+      // only access calendars that the user has created
+      if (cal.accessRole == "owner") {
+        ocals.push({
+          id: cal.id,
+          name: cal.summary,
+          color: cal.backgroundColor
+        });
+      }
     }
 
     var total = ocals.length;

@@ -6,6 +6,7 @@ function Controller(output, handlers) {
   this.prefs = new Preferences();
   // create a local instance of a Calendar storage (see class calendar.js for more details)
   this.cal = new Calendar();
+  this.blst = new BookList();
   this.handlers = handlers;
 
   var c = this;
@@ -34,6 +35,7 @@ function Controller(output, handlers) {
           c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
 
+        // todo: remove this as it's no longer used
         case "bookAddEvent":
           var book = output.getElementById("book").value;
           var freq = output.getElementById("freq").value;
@@ -53,7 +55,7 @@ function Controller(output, handlers) {
           break;
 
         case "addProject":
-          c.display.render("book_add", {});
+          c.display.render("book_add", {callback:c._callback});
           break;
 
         case "displayProgress":
@@ -69,15 +71,12 @@ function Controller(output, handlers) {
       switch(event) {
         case "fetchEvents":
           console.log("Fetched events from calendar " + config.name);
-          console.log("Number " + (config.currentIndex+1) + " of " + config.total);
-          console.log("Id: " + config.id);
-          console.log("Color: " + config.color);
 
           for(var i in config.events)
             c.cal.parseEvent(config.events[i], config.color);
 
           if (config.currentIndex + 1 == config.total) {
-            console.log("Retrieved all calendars, displaying...")
+            console.log("Retrieved all calendars");
             c.display.render("calendar", {cal:c.cal, handlers: c.handlers});
           }
           break;
@@ -86,6 +85,18 @@ function Controller(output, handlers) {
           break;
         case "deleteEvent":
           console.log("Successfully deleted event from Google Calendar");
+          break;
+      }
+    }
+    else if (origin == "BookMan") {
+      switch(event) {
+        case "addBook":
+          var book = c.blst.parseBook(config.book);
+          console.log(book);
+          c.blst.addBook(book);
+          var rdays = addBookEvent(c.cal, book, new Date());
+          c.cal.manageEvents(rdays, book);
+          c.display.render("calendar", {cal:c.cal, handlers: handlers});
           break;
       }
     }
@@ -103,54 +114,130 @@ Controller.prototype.execute = function() {
 $(document).ready(function() {
   this.handlers = {};
   var c = new Controller(document, this.handlers);
-  //c.execute();
 });
 
 // todo: separate this into Book Manager, Machine Learning, and Schedule Manager modules
-function addBookEvent(cal, book) {
-  var t_slots = cal.timeSlots();
-  var d_slots = cal.daySlots();
+function addBookEvent(cal, book, cstart) {
+  console.log("Analyzing and generating reading events");
+  // todo: store these inside preferences
+  var sleep_time = 8; // how many hours are spent sleeping
+  var pace = 15; // how many pages can be read an hour
+  var allotment = 10; // how many % of your free time is dedicated to reading
 
-  var queue = [];
+  var cyear = cstart.getFullYear();
+  var cmonth = cstart.getMonth();
+  var cdate = cstart.getDate();
+  var cday = cstart.getDay();
 
-  // queue the days of the week and count how many events are in each
-  for (var i=0; i<d_slots; i++) {
-    queue[i] = 0;
-    var d = cal.getDay(i+1);
-    for (var j=0; j<t_slots; j++) {
-      var t = cal.getTime(j);
-      var e = cal.getEvent(d, t);
-      if (e != "")
-        queue[i] += 1;
-    }
+  var events = [];
+
+  for (var i in cal.events) {
+    var event = cal.events[i];
+    var estart = new Date(event.start);
+    var eyear = estart.getFullYear();
+    var emonth = estart.getMonth();
+    var edate = estart.getDate();
+
+    if(cyear < eyear || (cyear == eyear && cmonth <= emonth && cdate <= edate))
+      events.push(event);
   }
 
-  var min = queue[0];
-  var min_i = 0;
+  var total = book.pages;
+  var days = book.days;
+  var temp = days[6];
 
-  // find the day with the least events
-  for (var i in queue) {
-    if (queue[i] < min) {
-      min_i = parseInt(i);
-      min = queue[i];
+  for(var i=6; i>0; i--)
+    days[i] = days[i-1];
+  days[0] = temp;
+
+  var cursor = 0;
+  var cdays = [0, 0, 0, 0, 0, 0, 0];
+  var ostart = new Date(cstart.getTime());
+
+  var rdays = [];
+  var flag = false;
+
+  while(total > 0) {
+    cyear = cstart.getFullYear();
+    cmonth = cstart.getMonth();
+    cdate = cstart.getDate();
+    cday = cstart.getDay();
+    var sum = 0;
+
+    // if the user has indicated that today is available for reading projects
+    //console.log(cday + " is " + days[cday]);
+    if(days[cday]) {
+      var bhours = sleep_time;
+
+      for(var i in events) {
+        var event = events[i];
+        var estart = new Date(event.start);
+        var eyear = estart.getFullYear();
+        var emonth = estart.getMonth();
+        var edate = estart.getDate();
+        var eend = new Date(event.end);
+
+        if(cyear==eyear && cmonth==emonth && cdate==edate) {
+          var bdiff = eend.getTime() - estart.getTime();
+          // need error checking for events that go on for longer than a day
+          bdiff = bdiff / (60 * 60 * 1000);
+          bhours += bdiff;
+        }
+      }
+
+      var ahours = 24 - bhours;
+      if (ahours < 0) ahours = 0;
+      sum += ahours;
+      cdays[cursor] = ahours;
     }
+
+    cursor++;
+
+    if(cursor == 7) {
+      for(var i=0; i<7; i++) {
+        var pstart = new Date(ostart.getTime());
+        var oyear = ostart.getFullYear();
+        var omonth = ostart.getMonth();
+        var odate = ostart.getDate();
+        pstart.setDate(odate + i);
+
+        if(pstart.getDate() < odate) {
+          pstart.setMonth(omonth + 1);
+          if(pstart.getMonth() < omonth)
+            pstart.setFullYear(oyear + 1);
+        }
+
+        var pyear = pstart.getFullYear();
+        var pmonth = pstart.getMonth();
+        var pdate = pstart.getDate();
+        var time = Math.round(cdays[i] * allotment / 10) / 10.0;
+
+        if(time > 0.0)
+        rdays.push({
+          date: pyear + "-" + (pmonth+1) + "-" + pdate + "T00:00:00",
+          time: time,
+        });
+      }
+
+      flag = true;
+      cursor = 0;
+      cday = [0, 0, 0, 0, 0, 0, 0];
+    }
+
+    cstart.setDate(cdate + 1);
+    if(cstart.getDate() < cdate) {
+      cstart.setMonth(cmonth + 1);
+      if(cstart.getMonth() < cmonth)
+        cstart.setFullYear(cyear + 1);
+    }
+
+    if(flag) {
+      ostart = new Date(cstart.getTime());
+      flag = false;
+    }
+
+    total -= sum * pace * allotment / 100;
   }
 
-  var times = [];
-  var times_i = 0;
-  var d = cal.getDay(min_i+1);
-
-  for (var i=0; i<t_slots; i++) {
-    var t = cal.getTime(i);
-    var e = cal.getEvent(d, t);
-    if (e == "") {
-      times[times_i] = t;
-      times_i += 1;
-    }
-  }
-
-  var rand_t = Math.floor(Math.random() * times.length);
-  var t = times[rand_t];
-
-  cal.addEvent(book, d, t);
+  return rdays;
 }
